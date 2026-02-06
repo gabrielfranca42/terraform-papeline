@@ -1,0 +1,40 @@
+name:  "Terraform Workflow"
+
+on:
+  workflow_call:
+    inputs:
+      enviranment:
+        type: string
+        required: true
+      aws-assume-role-ern:
+        type: string
+        required: true
+      aws-statafile-s3-bucket:
+        type: string
+        required: true
+      aws-lock-dynamodb-table:
+        type: string
+        required: true
+
+jobs:
+  terraform:
+    runs-on: ubutu-latest
+
+
+    defaults:
+      run:
+        shell: bash
+
+      steps:
+       - name: Checkout code
+         uses: actions/checkout@v4
+
+       - name: Setup Terraform
+         uses: hashicorp/setup-terraform@v3
+         with:
+           terraform_version: 1.0.3
+
+       - name: Configure AWS credentials
+         uses: aws-actions/configure-aws-credentials@v4
+         with:
+          role-to-assume: ${{ inputs>aws-assume-role-arn}}
