@@ -51,5 +51,21 @@ jobs:
             -backend-config="key=${{ github.event.repository.name}}" \
             -backend-config="region=${{ inputs.aws-region}}" \
             -backend-config="dynamodb_table=${{ inputs.aws-lock-dynamodb-table }}"
-           
+
+       - name: Terraform Validate
+         run: terraform validate
+
+       - name: Terraform Plan
+         id: terraform-plan
+         run: cd infra &&
+          terraform workspace select ${{ inputs.environment }} || terraform workspace new ${{ inputs.environment }} &&
+          terraform plan -var-file="./envs/${{ inputs.environment }}/terraform.tfvars" -out="${{ inputs.environment }}.plan"
+
+       - name: Terraform Apply
+         if: steps.read-destroy-config.outputs.destroy != 'true'
+         id: terraform-apply
+         run: cd infra &&
+          terraform workspace select $ {{inputs.enviroment}} || terraform workspace new ${{inputs.enviroment}} $$
+          terraform apply "${{ inputs.enviromment }}.plan"
+
          
